@@ -1,5 +1,6 @@
 package gd.rf.acro.ace;
 
+import dev.louis.nebula.NebulaManager;
 import gd.rf.acro.ace.blocks.BurntRedstoneBlock;
 import gd.rf.acro.ace.blocks.FleetingBlock;
 import gd.rf.acro.ace.blocks.SeepingIceBlock;
@@ -8,6 +9,7 @@ import gd.rf.acro.ace.effects.*;
 import gd.rf.acro.ace.entities.BoltEntity;
 import gd.rf.acro.ace.entities.EvilMageEntity;
 import gd.rf.acro.ace.items.*;
+import gd.rf.acro.ace.mana.manager.ACEManaManager;
 import gd.rf.acro.ace.spells.SpellACE;
 import gd.rf.acro.ace.spells.Spells;
 import gd.rf.acro.ace.spells.SpellsOld;
@@ -48,6 +50,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ACE implements ModInitializer {
+	public static final String MOD_ID = "nebula";
 
 	private static final List<Identifier> tables = Arrays.asList(
 			LootTables.BURIED_TREASURE_CHEST,
@@ -68,6 +71,7 @@ public class ACE implements ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
+		NebulaManager.INSTANCE.registerManaManagerFactory(ACEManaManager::new);
 		Spells.init();
 		Registry.register(Registries.ITEM_GROUP, new Identifier("ace", "aceitems"), TAB);
 		registerItems();
@@ -76,22 +80,17 @@ public class ACE implements ModInitializer {
 
 
 		registerEntityThings();
-		ServerPlayNetworking.registerGlobalReceiver(ACE.SCROLL_PACKET,(server,serverPlayerEntity,serverPlayNetworkHandler,packetByteBuf,packetSender)->
-		{
-			if(serverPlayerEntity.getMainHandStack().getItem() instanceof IRenderableCastingDevice)
-			{
+		ServerPlayNetworking.registerGlobalReceiver(ACE.SCROLL_PACKET,(server,serverPlayerEntity,serverPlayNetworkHandler,packetByteBuf,packetSender) -> {
+			if(serverPlayerEntity.getMainHandStack().getItem() instanceof IRenderableCastingDevice) {
 				int scroll = packetByteBuf.readInt();
 				IRenderableCastingDevice spellBook = (IRenderableCastingDevice) serverPlayerEntity.getMainHandStack().getItem();
 				serverPlayerEntity.playSound(SoundEvents.BLOCK_DISPENSER_FAIL,1,1);
-				if(scroll<0)
-				{
+				if(scroll<0) {
 					spellBook.scrollMinus(serverPlayerEntity.getMainHandStack());
 				}
-				else
-				{
+				else {
 					spellBook.scrollPlus(serverPlayerEntity.getMainHandStack());
 				}
-
 			}
 		});
 

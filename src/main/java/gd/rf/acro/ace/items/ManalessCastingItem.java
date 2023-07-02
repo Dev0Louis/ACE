@@ -94,13 +94,12 @@ public class ManalessCastingItem extends Item implements IRenderableCastingDevic
     }
 
 
-    public SpellACE getEquipped(ItemStack stack) {
-        if(stack.hasNbt() && stack.getNbt().contains("spellsEquipped"))
-        {
+    public SpellType<?> getEquipped(ItemStack stack) {
+        if(stack.hasNbt() && stack.getNbt().contains("spellsEquipped")) {
             NbtCompound tag = stack.getNbt();
 
             NbtList spells = (NbtList) tag.get("spellsEquipped");
-            return SpellsOld.getSpellByName(spells.getString(tag.getInt("selected")));
+            return SpellType.get(spells.getString(tag.getInt("selected"))).get();
         }
         return null;
 
@@ -127,23 +126,20 @@ public class ManalessCastingItem extends Item implements IRenderableCastingDevic
         }
         tag=stack.getNbt();
         //mana regen (per second)
-        if(world.getTimeOfDay()%20L==0L)
-        {
+        if(world.getTimeOfDay()%20L==0L) {
             tag.putInt("mana", Math.min(tag.getInt("mana") + tag.getInt("manaRegen"), tag.getInt("maxMana")));
             stack.setNbt(tag);
         }
 
     }
 
-    public void scrollMinus(ItemStack stack)
-    {
+    public void scrollMinus(ItemStack stack) {
         NbtCompound tag = stack.getNbt();
         NbtList spells = (NbtList) tag.get("spellsEquipped");
 
-        if(tag.getInt("selected")>0) {
+        if(tag.getInt("selected") > 0) {
             tag.putInt("selected",tag.getInt("selected")-1);
-        }
-        else {
+        } else {
             tag.putInt("selected", spells.size()-1);
         }
         stack.setNbt(tag);

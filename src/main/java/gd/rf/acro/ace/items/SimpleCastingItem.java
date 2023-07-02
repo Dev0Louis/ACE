@@ -1,5 +1,6 @@
 package gd.rf.acro.ace.items;
 
+import dev.louis.nebula.spell.SpellType;
 import gd.rf.acro.ace.ACE;
 import gd.rf.acro.ace.spells.*;
 import gd.rf.acro.ace.spells.SpellACE.CastingType;
@@ -100,12 +101,12 @@ public class SimpleCastingItem extends Item implements IRenderableCastingDevice{
     }
 
 
-    public SpellACE getEquipped(ItemStack stack) {
+    public SpellType<?> getEquipped(ItemStack stack) {
         if(stack.hasNbt() && stack.getNbt().contains("spellsEquipped")) {
             NbtCompound tag = stack.getNbt();
 
             NbtList spells = (NbtList) tag.get("spellsEquipped");
-            return SpellsOld.getSpellByName(spells.getString(tag.getInt("selected")));
+            return SpellType.get(spells.getString(tag.getInt("selected"))).get();
         }
         return null;
 
@@ -156,12 +157,10 @@ public class SimpleCastingItem extends Item implements IRenderableCastingDevice{
     public void scrollPlus(ItemStack stack) {
         NbtCompound tag = stack.getNbt();
         NbtList spells = (NbtList) tag.get("spellsEquipped");
-        if(tag.getInt("selected")< spells.size()-1)
-        {
+        if(tag.getInt("selected")< spells.size()-1) {
             tag.putInt("selected",tag.getInt("selected")+1);
         }
-        else
-        {
+        else {
             tag.putInt("selected",0);
         }
         stack.setNbt(tag);
